@@ -1,7 +1,6 @@
 import { useRef, type ReactNode } from 'react'
 import HeroCanvas from './HeroCanvas'
 import OceanHUD from './OceanHUD'
-import GrainOverlay from './GrainOverlay'
 import { useOceanScroll } from '../hooks/useOceanScroll'
 
 interface OceanSceneProps {
@@ -21,7 +20,6 @@ export default function OceanScene({ children }: OceanSceneProps) {
         style={{ gridArea: '1 / 1' }}
       >
         <HeroCanvas scrollProg={scrollProg} />
-        <GrainOverlay />
         <div
           className="pointer-events-none absolute inset-x-0 top-0 z-10 h-px bg-[#8ce1e6]"
           style={{ opacity: scanLineOpacity, animation: 'scanline 6s linear infinite' }}
