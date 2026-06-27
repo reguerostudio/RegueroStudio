@@ -33,27 +33,32 @@ function buildEmailHtml(name: string, email: string, message: string) {
   const safeEmail = escapeHtml(email)
   const safeMessage = escapeHtml(message).replace(/\n/g, '<br />')
 
+  const FONT_STACK = "'Outfit', Helvetica, Arial, sans-serif"
+
   return `
-  <div style="background-color:#0a0f14;padding:40px 20px;font-family:Helvetica,Arial,sans-serif;">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600&display=swap');
+  </style>
+  <div style="background-color:#0a0f14;padding:40px 20px;font-family:${FONT_STACK};">
     <div style="max-width:480px;margin:0 auto;background-color:#0e1c28;border:1px solid rgba(87,184,188,0.15);border-radius:8px;overflow:hidden;">
       <div style="padding:24px 28px;border-bottom:1px solid rgba(87,184,188,0.15);">
-        <p style="margin:0;color:#57b8bc;font-size:11px;letter-spacing:2px;text-transform:uppercase;">Reguero Studio</p>
-        <p style="margin:6px 0 0;color:#dde8e9;font-size:20px;font-style:italic;">Nuevo lead</p>
+        <p style="margin:0;color:#57b8bc;font-size:11px;letter-spacing:2px;text-transform:uppercase;font-family:${FONT_STACK};">Reguero Studio</p>
+        <p style="margin:6px 0 0;color:#dde8e9;font-size:20px;font-style:italic;font-family:${FONT_STACK};">Nuevo lead</p>
       </div>
       <div style="padding:24px 28px;">
-        <p style="margin:0 0 4px;color:#57b8bc;font-size:11px;letter-spacing:1px;text-transform:uppercase;">Nombre</p>
-        <p style="margin:0 0 20px;color:#dde8e9;font-size:16px;">${safeName}</p>
+        <p style="margin:0 0 4px;color:#57b8bc;font-size:11px;letter-spacing:1px;text-transform:uppercase;font-family:${FONT_STACK};">Nombre</p>
+        <p style="margin:0 0 20px;color:#dde8e9;font-size:16px;font-family:${FONT_STACK};">${safeName}</p>
 
-        <p style="margin:0 0 4px;color:#57b8bc;font-size:11px;letter-spacing:1px;text-transform:uppercase;">Email</p>
+        <p style="margin:0 0 4px;color:#57b8bc;font-size:11px;letter-spacing:1px;text-transform:uppercase;font-family:${FONT_STACK};">Email</p>
         <p style="margin:0 0 20px;">
-          <a href="mailto:${safeEmail}" style="color:#9fe0e5;font-size:16px;text-decoration:none;">${safeEmail}</a>
+          <a href="mailto:${safeEmail}" style="color:#9fe0e5;font-size:16px;text-decoration:none;font-family:${FONT_STACK};">${safeEmail}</a>
         </p>
 
-        <p style="margin:0 0 4px;color:#57b8bc;font-size:11px;letter-spacing:1px;text-transform:uppercase;">Mensaje</p>
-        <p style="margin:0;color:#dde8e9;font-size:15px;line-height:1.6;">${safeMessage}</p>
+        <p style="margin:0 0 4px;color:#57b8bc;font-size:11px;letter-spacing:1px;text-transform:uppercase;font-family:${FONT_STACK};">Mensaje</p>
+        <p style="margin:0;color:#dde8e9;font-size:15px;line-height:1.6;font-family:${FONT_STACK};">${safeMessage}</p>
       </div>
       <div style="padding:16px 28px;border-top:1px solid rgba(87,184,188,0.15);">
-        <a href="mailto:${safeEmail}" style="display:inline-block;background-color:#57b8bc;color:#0a0a0a;font-size:13px;font-weight:600;padding:10px 20px;border-radius:999px;text-decoration:none;">Responder a ${safeName.split(' ')[0]}</a>
+        <a href="mailto:${safeEmail}" style="display:inline-block;background-color:#57b8bc;color:#0a0a0a;font-size:13px;font-weight:600;padding:10px 20px;border-radius:999px;text-decoration:none;font-family:${FONT_STACK};">Responder a ${safeName.split(' ')[0]}</a>
       </div>
     </div>
     <p style="text-align:center;color:rgba(221,232,233,0.3);font-size:11px;margin-top:20px;">Reguero Studio · Madrid · 2026</p>
