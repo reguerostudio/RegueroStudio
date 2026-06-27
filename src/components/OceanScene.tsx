@@ -30,6 +30,14 @@ export default function OceanScene({ children }: OceanSceneProps) {
             100% { transform: translateY(100dvh); }
           }
         `}</style>
+        {/* fade inferior: refuerza el contraste del HUD/texto contra las partículas, más marcado cuanto más cerca de la superficie */}
+        <div
+          className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-40 sm:h-48"
+          style={{
+            background: 'linear-gradient(to top, rgba(0,0,0,0.55), rgba(0,0,0,0))',
+            opacity: 0.5 + (1 - scrollProg) * 0.5,
+          }}
+        />
         <OceanHUD scrollProg={scrollProg} depthMeters={depthMeters} />
       </div>
 

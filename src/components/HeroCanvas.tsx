@@ -304,7 +304,7 @@ export default function HeroCanvas({ scrollProg }: HeroCanvasProps) {
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 z-0 h-full w-full"
+      className="absolute inset-0 z-0 h-full w-full"
       aria-hidden="true"
     />
   )
