@@ -2,12 +2,14 @@ import { useEffect, useRef } from 'react'
 
 // Sistema completo validado — Canvas 2D · Reguero Studio Hero
 // Paleta: #57b8bc (superficie) → #152636 (fondo marino)
-// Orden de draw: background → caustics → partículas (3 capas parallax) → pings → viñeta
+// Orden de draw: background → caustics → partículas (3 capas parallax, sprite) → pings → viñeta
+// Partículas renderizadas como sprite pre-calculado (drawImage) en vez de gradiente por partícula/frame: mucho más barato en CPU/GPU, clave para que vaya fluido en móvil.
 
 const TOP = { r: 87, g: 184, b: 188 } // #57b8bc
 const BOT = { r: 21, g: 38, b: 54 } // #152636
 
 const MOUSE_RADIUS = 100
+const IS_MOBILE = typeof window !== 'undefined' && window.innerWidth < 768
 
 function lerp(a: number, b: number, t: number) {
   return a + (b - a) * t
@@ -41,7 +43,7 @@ interface Particle {
   vy: number
   sz: number
   op: number
-  glowSize: number
+  spriteSize: number
   boost: number
 }
 
@@ -51,13 +53,15 @@ interface ParticleLayer {
 }
 
 const LAYER_DEFS = [
-  { count: 140, sizeRange: [0.5, 1.2] as [number, number], speedMul: 0.35, parallax: 0.012, opRange: [0.05, 0.14] as [number, number] },
-  { count: 220, sizeRange: [0.9, 2.0] as [number, number], speedMul: 1, parallax: 0.035, opRange: [0.1, 0.28] as [number, number] },
-  { count: 60, sizeRange: [1.8, 3.4] as [number, number], speedMul: 1.7, parallax: 0.08, opRange: [0.22, 0.42] as [number, number] },
+  { count: 90, sizeRange: [0.5, 1.2] as [number, number], speedMul: 0.35, parallax: 0.012, opRange: [0.05, 0.14] as [number, number] },
+  { count: 140, sizeRange: [0.9, 2.0] as [number, number], speedMul: 1, parallax: 0.035, opRange: [0.1, 0.28] as [number, number] },
+  { count: 40, sizeRange: [1.8, 3.4] as [number, number], speedMul: 1.7, parallax: 0.08, opRange: [0.22, 0.42] as [number, number] },
 ]
+const MOBILE_COUNT_MUL = 0.55
 
 function createLayer(w: number, h: number, def: (typeof LAYER_DEFS)[number]): ParticleLayer {
-  const particles = Array.from({ length: def.count }, () => {
+  const count = Math.round(def.count * (IS_MOBILE ? MOBILE_COUNT_MUL : 1))
+  const particles = Array.from({ length: count }, () => {
     const sz = rand(def.sizeRange[0], def.sizeRange[1])
     return {
       x: rand(0, w),
@@ -66,41 +70,61 @@ function createLayer(w: number, h: number, def: (typeof LAYER_DEFS)[number]): Pa
       vy: rand(-0.08, 0.08) * def.speedMul,
       sz,
       op: rand(def.opRange[0], def.opRange[1]),
-      glowSize: sz * rand(4, 10),
+      spriteSize: sz * rand(4, 10) * 2, // diámetro del sprite (glow incluido)
       boost: 0,
     }
   })
   return { particles, parallax: def.parallax }
 }
 
+// Sprite único: glow + núcleo + brillo central, pre-renderizado una vez a alpha=1.
+// Cada partícula solo hace un drawImage con globalAlpha = su opacidad actual.
+const SPRITE_RES = 128
+function createParticleSprite(): HTMLCanvasElement {
+  const sprite = document.createElement('canvas')
+  sprite.width = SPRITE_RES
+  sprite.height = SPRITE_RES
+  const sctx = sprite.getContext('2d')!
+  const c = SPRITE_RES / 2
+
+  const glow = sctx.createRadialGradient(c, c, 0, c, c, c)
+  glow.addColorStop(0, 'rgba(140, 225, 230, 0.5)')
+  glow.addColorStop(1, 'rgba(140, 225, 230, 0)')
+  sctx.fillStyle = glow
+  sctx.beginPath()
+  sctx.arc(c, c, c, 0, Math.PI * 2)
+  sctx.fill()
+
+  const coreR = c * 0.22
+  sctx.fillStyle = 'rgba(160, 230, 235, 1)'
+  sctx.beginPath()
+  sctx.arc(c, c, coreR, 0, Math.PI * 2)
+  sctx.fill()
+
+  sctx.fillStyle = 'rgba(255, 255, 255, 0.65)'
+  sctx.beginPath()
+  sctx.arc(c, c, coreR * 0.35, 0, Math.PI * 2)
+  sctx.fill()
+
+  return sprite
+}
+
 function drawParticle(
   ctx: CanvasRenderingContext2D,
+  sprite: HTMLCanvasElement,
   p: Particle,
   brightness: number,
   ox: number,
   oy: number,
 ) {
   const op = Math.min(1, (p.op + p.boost) * brightness)
+  if (op <= 0.005) return
   const x = p.x + ox
   const y = p.y + oy
-
-  const glow = ctx.createRadialGradient(x, y, 0, x, y, p.glowSize)
-  glow.addColorStop(0, `rgba(140, 225, 230, ${op * 0.5})`)
-  glow.addColorStop(1, 'rgba(140, 225, 230, 0)')
-  ctx.fillStyle = glow
-  ctx.beginPath()
-  ctx.arc(x, y, p.glowSize, 0, Math.PI * 2)
-  ctx.fill()
-
-  ctx.fillStyle = `rgba(160, 230, 235, ${op})`
-  ctx.beginPath()
-  ctx.arc(x, y, p.sz, 0, Math.PI * 2)
-  ctx.fill()
-
-  ctx.fillStyle = `rgba(255, 255, 255, ${op * 0.65})`
-  ctx.beginPath()
-  ctx.arc(x, y, p.sz * 0.35, 0, Math.PI * 2)
-  ctx.fill()
+  const s = p.spriteSize
+  ctx.globalAlpha = op
+  ctx.drawImage(sprite, x - s / 2, y - s / 2, s, s)
+  ctx.globalAlpha = 1
 }
 
 interface Ping {
@@ -134,10 +158,11 @@ export default function HeroCanvas({ scrollProg }: HeroCanvasProps) {
     const c: HTMLCanvasElement = canvas
     const ctx: CanvasRenderingContext2D = ctx2d
 
-    const dpr = Math.min(window.devicePixelRatio || 1, 2)
+    const dpr = Math.min(window.devicePixelRatio || 1, IS_MOBILE ? 1.5 : 2)
     let w = 0
     let h = 0
 
+    const sprite = createParticleSprite()
     const layers = LAYER_DEFS.map((def) => createLayer(window.innerWidth, window.innerHeight, def))
     const pings: Ping[] = []
 
@@ -166,9 +191,16 @@ export default function HeroCanvas({ scrollProg }: HeroCanvasProps) {
 
     let raf = 0
     let running = true
+    let paused = false
+
+    function onVisibility() {
+      paused = document.hidden
+      if (!paused && running) raf = requestAnimationFrame(frame)
+    }
+    document.addEventListener('visibilitychange', onVisibility)
 
     function frame(t: number) {
-      if (!running) return
+      if (!running || paused) return
       const scrollProgNow = scrollProgRef.current
       const color = lerpC(TOP, BOT, scrollProgNow)
       const brightness = 1 - scrollProgNow * 0.78
@@ -184,8 +216,8 @@ export default function HeroCanvas({ scrollProg }: HeroCanvasProps) {
       ctx.fillStyle = bgGrad
       ctx.fillRect(0, 0, w, h)
 
-      // caustics (solo en superficie)
-      if (surfaceFade > 0.01) {
+      // caustics (solo en superficie, se omiten en móvil para aligerar)
+      if (!IS_MOBILE && surfaceFade > 0.01) {
         const causticAlpha = surfaceFade * 0.055
         for (let i = 0; i < 5; i++) {
           const cx = (Math.sin(t * 0.0002 + i * 1.7) * 0.5 + 0.5) * w
@@ -222,13 +254,15 @@ export default function HeroCanvas({ scrollProg }: HeroCanvasProps) {
           if (p.y < -50) p.y = h + 50
           if (p.y > h + 50) p.y = -50
 
-          const dx = p.x + ox - mouse.x
-          const dy = p.y + oy - mouse.y
-          const dist = Math.sqrt(dx * dx + dy * dy)
-          const targetBoost = dist < MOUSE_RADIUS ? (1 - dist / MOUSE_RADIUS) * 0.45 : 0
-          p.boost += (targetBoost - p.boost) * 0.08
+          if (!IS_MOBILE) {
+            const dx = p.x + ox - mouse.x
+            const dy = p.y + oy - mouse.y
+            const dist = Math.sqrt(dx * dx + dy * dy)
+            const targetBoost = dist < MOUSE_RADIUS ? (1 - dist / MOUSE_RADIUS) * 0.45 : 0
+            p.boost += (targetBoost - p.boost) * 0.08
+          }
 
-          drawParticle(ctx, p, brightness, ox, oy)
+          drawParticle(ctx, sprite, p, brightness, ox, oy)
         }
       })
 
@@ -263,6 +297,7 @@ export default function HeroCanvas({ scrollProg }: HeroCanvasProps) {
       window.removeEventListener('resize', resize)
       window.removeEventListener('mousemove', onMouseMove)
       window.removeEventListener('click', onClick)
+      document.removeEventListener('visibilitychange', onVisibility)
     }
   }, [])
 
