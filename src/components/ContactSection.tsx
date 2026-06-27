@@ -1,4 +1,5 @@
 import { useState, type FormEvent, type KeyboardEvent } from 'react'
+import { Link } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { ArrowRight, Check } from 'lucide-react'
 
@@ -21,11 +22,12 @@ export default function ContactSection() {
   const [sending, setSending] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [focused, setFocused] = useState(false)
+  const [accepted, setAccepted] = useState(false)
 
   const current = STEPS[step]
   const isLast = step === STEPS.length - 1
   const value = current ? form[current.key] : ''
-  const canAdvance = value.trim().length > 0
+  const canAdvance = value.trim().length > 0 && (!isLast || accepted)
 
   function update(v: string) {
     if (!current) return
@@ -123,6 +125,24 @@ export default function ContactSection() {
                     }}
                   />
                 </div>
+
+                {isLast && (
+                  <label className="flex max-w-xs items-start gap-2 text-left font-sans text-xs text-[#dde8e9]/50">
+                    <input
+                      type="checkbox"
+                      checked={accepted}
+                      onChange={(e) => setAccepted(e.target.checked)}
+                      className="mt-0.5 h-3.5 w-3.5 flex-none accent-[#57b8bc]"
+                    />
+                    <span>
+                      He leído y acepto la{' '}
+                      <Link to="/privacidad" className="text-[#9fe0e5] underline">
+                        política de privacidad
+                      </Link>
+                      .
+                    </span>
+                  </label>
+                )}
 
                 <button
                   type="submit"
