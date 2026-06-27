@@ -13,12 +13,10 @@ export default function OceanScene({ children }: OceanSceneProps) {
   const scanLineOpacity = (1 - scrollProg) * 0.15
 
   return (
-    <div ref={containerRef} className="grid">
-      {/* Fondo fijo: canvas + scan line + HUD, pinned durante todo el descenso */}
-      <div
-        className="hero-zoom sticky top-0 z-0 h-[100dvh] w-full overflow-hidden"
-        style={{ gridArea: '1 / 1' }}
-      >
+    <div ref={containerRef} className="relative">
+      {/* Fondo fijo: canvas + scan line + HUD, pinned durante todo el descenso.
+          Sin CSS Grid a propósito: sticky dentro de grid tiene bugs conocidos en Safari/WebKit. */}
+      <div className="hero-zoom sticky top-0 z-0 h-[100dvh] w-full overflow-hidden">
         <HeroCanvas scrollProg={scrollProg} />
         <div
           className="pointer-events-none absolute inset-x-0 top-0 z-10 h-px bg-[#8ce1e6]"
@@ -41,8 +39,8 @@ export default function OceanScene({ children }: OceanSceneProps) {
         <OceanHUD scrollProg={scrollProg} depthMeters={depthMeters} />
       </div>
 
-      {/* Contenido: se desplaza por encima del fondo fijo, en la misma celda de grid */}
-      <div className="relative z-10" style={{ gridArea: '1 / 1' }}>
+      {/* Contenido: se solapa con el fondo gracias al margen negativo, y se desplaza por encima al hacer scroll */}
+      <div className="relative z-10" style={{ marginTop: '-100dvh' }}>
         {children(scrollProg)}
       </div>
     </div>
