@@ -6,6 +6,8 @@ import AboutSection from '../components/AboutSection'
 import ProcessSection from '../components/ProcessSection'
 import ServicesSection from '../components/ServicesSection'
 import FAQSection from '../components/FAQSection'
+import UmbralSection from '../components/UmbralSection'
+import InmersoSection from '../components/InmersoSection'
 import Footer from '../components/Footer'
 
 export default function HomePage() {
@@ -24,6 +26,8 @@ export default function HomePage() {
       </OceanScene>
       <ServicesSection />
       <FAQSection />
+      <UmbralSection />
+      <InmersoSection />
       <Footer />
     </main>
   )
