@@ -4,16 +4,21 @@ import { useInmersoActive } from '../hooks/useInmersoActive'
 import { INMERSO, withAlpha } from '../lib/theme'
 
 const STORAGE_KEY = 'inmerso-sound-enabled'
+const PEAK_GAIN = 0.014 // deliberadamente muy bajo, casi subliminal
 
-interface RumbleNodes {
-  osc1: OscillatorNode
-  osc2: OscillatorNode
-  gain: GainNode
+interface AmbientNodes {
+  sub: OscillatorNode
+  noise: AudioBufferSourceNode
+  lfo: OscillatorNode
+  masterGain: GainNode
 }
 
-/** Toggle de sonido ambiente (retumbo grave sintetizado, sin asset de audio).
- * Muteado por defecto. Nunca autoplay con sonido activo al cargar: si había
- * preferencia guardada, se retoma solo tras el primer gesto real del usuario. */
+/** Toggle de sonido ambiente: textura de "corriente submarina" (ruido
+ * filtrado) + un sub grave casi imperceptible, con una modulación lenta
+ * tipo respiración en vez de un tono fijo. Nada de dos senos cercanos
+ * batiendo entre sí (sonaba a motor). Muteado por defecto. Nunca autoplay
+ * con sonido activo al cargar: si había preferencia guardada, se retoma
+ * solo tras el primer gesto real del usuario. */
 export default function InmersoSoundToggle() {
   const active = useInmersoActive()
   const [enabled, setEnabled] = useState(() => {
@@ -24,56 +29,88 @@ export default function InmersoSoundToggle() {
     }
   })
   const ctxRef = useRef<AudioContext | null>(null)
-  const nodesRef = useRef<RumbleNodes | null>(null)
+  const nodesRef = useRef<AmbientNodes | null>(null)
 
-  function startRumble() {
+  function startAmbient() {
     if (ctxRef.current) {
       ctxRef.current.resume()
       return
     }
     const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
     const ctx = new AudioCtx()
-    const gain = ctx.createGain()
-    gain.gain.value = 0
-    gain.connect(ctx.destination)
 
-    const osc1 = ctx.createOscillator()
-    osc1.type = 'sine'
-    osc1.frequency.value = 42
-    osc1.connect(gain)
-    osc1.start()
+    const masterGain = ctx.createGain()
+    masterGain.gain.value = 0
+    masterGain.connect(ctx.destination)
 
-    const osc2 = ctx.createOscillator()
-    osc2.type = 'sine'
-    osc2.frequency.value = 55
-    osc2.connect(gain)
-    osc2.start()
+    // respiración lenta sobre el volumen general, nada de tono fijo estático
+    const lfo = ctx.createOscillator()
+    lfo.type = 'sine'
+    lfo.frequency.value = 0.06 // un ciclo cada ~16s
+    const lfoGain = ctx.createGain()
+    lfoGain.gain.value = 0.005
+    lfo.connect(lfoGain)
+    lfoGain.connect(masterGain.gain)
+    lfo.start()
 
-    gain.gain.linearRampToValueAtTime(0.035, ctx.currentTime + 1.2)
+    // sub grave, casi imperceptible, da presencia sin sonar a maquinaria
+    const sub = ctx.createOscillator()
+    sub.type = 'sine'
+    sub.frequency.value = 38
+    const subGain = ctx.createGain()
+    subGain.gain.value = 0.45
+    sub.connect(subGain)
+    subGain.connect(masterGain)
+    sub.start()
+
+    // textura de corriente submarina: ruido filtrado, no un tono puro
+    const bufferSeconds = 2
+    const noiseBuffer = ctx.createBuffer(1, ctx.sampleRate * bufferSeconds, ctx.sampleRate)
+    const data = noiseBuffer.getChannelData(0)
+    for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1
+
+    const noise = ctx.createBufferSource()
+    noise.buffer = noiseBuffer
+    noise.loop = true
+
+    const noiseFilter = ctx.createBiquadFilter()
+    noiseFilter.type = 'lowpass'
+    noiseFilter.frequency.value = 220
+    noiseFilter.Q.value = 0.7
+
+    const noiseGain = ctx.createGain()
+    noiseGain.gain.value = 0.4
+    noise.connect(noiseFilter)
+    noiseFilter.connect(noiseGain)
+    noiseGain.connect(masterGain)
+    noise.start()
+
+    masterGain.gain.linearRampToValueAtTime(PEAK_GAIN, ctx.currentTime + 2)
 
     ctxRef.current = ctx
-    nodesRef.current = { osc1, osc2, gain }
+    nodesRef.current = { sub, noise, lfo, masterGain }
   }
 
-  function stopRumble() {
+  function stopAmbient() {
     const ctx = ctxRef.current
     const nodes = nodesRef.current
     if (!ctx || !nodes) return
-    nodes.gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.6)
+    nodes.masterGain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.8)
     window.setTimeout(() => {
-      nodes.osc1.stop()
-      nodes.osc2.stop()
+      nodes.sub.stop()
+      nodes.noise.stop()
+      nodes.lfo.stop()
       ctx.close()
       ctxRef.current = null
       nodesRef.current = null
-    }, 700)
+    }, 900)
   }
 
   // Preferencia guardada: no se reanuda hasta el primer gesto real.
   useEffect(() => {
     if (!enabled || ctxRef.current) return
     function resumeOnGesture() {
-      startRumble()
+      startAmbient()
       window.removeEventListener('pointerdown', resumeOnGesture)
       window.removeEventListener('keydown', resumeOnGesture)
     }
@@ -86,7 +123,7 @@ export default function InmersoSoundToggle() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // Pausa el retumbo cuando sales de la zona INMERSO, sin perder la preferencia.
+  // Pausa el ambiente cuando sales de la zona INMERSO, sin perder la preferencia.
   useEffect(() => {
     const ctx = ctxRef.current
     if (!ctx) return
@@ -95,7 +132,7 @@ export default function InmersoSoundToggle() {
   }, [active, enabled])
 
   useEffect(() => {
-    return () => stopRumble()
+    return () => stopAmbient()
   }, [])
 
   function toggle() {
@@ -106,8 +143,8 @@ export default function InmersoSoundToggle() {
     } catch {
       // localStorage no disponible, la preferencia solo dura esta sesión
     }
-    if (next) startRumble()
-    else stopRumble()
+    if (next) startAmbient()
+    else stopAmbient()
   }
 
   return (

@@ -1,6 +1,5 @@
 import { motion } from 'framer-motion'
 import Navbar from '../components/Navbar'
-import BioCanvas from '../components/BioCanvas'
 import CardVideo from '../components/CardVideo'
 import CardImagen from '../components/CardImagen'
 import CardCampana from '../components/CardCampana'
@@ -95,7 +94,6 @@ export default function InmersoPortfolioPage() {
         image={OG_IMAGE}
       />
       <Navbar />
-      <BioCanvas />
 
       {/* violet depth wash */}
       <div

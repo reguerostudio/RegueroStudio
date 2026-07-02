@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import { useInmersoActive } from '../hooks/useInmersoActive'
 
 interface Particle {
   x: number
@@ -17,10 +18,16 @@ function rand(a: number, b: number) {
   return a + Math.random() * (b - a)
 }
 
+/** Partículas bioluminiscentes de fondo para la capa INMERSO. Fijo al
+ * viewport (no crece con la altura de la sección) para que la densidad
+ * de partículas sea siempre la misma y no se muevan dos veces (por su
+ * propia animación y por el scroll de la página a la vez). */
 export default function BioCanvas() {
+  const active = useInmersoActive()
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
+    if (!active) return
     const canvasEl = canvasRef.current
     if (!canvasEl) return
     const ctx2d = canvasEl.getContext('2d')
@@ -35,8 +42,8 @@ export default function BioCanvas() {
     const particles: Particle[] = []
 
     function init() {
-      W = canvas.offsetWidth
-      H = canvas.offsetHeight
+      W = window.innerWidth
+      H = window.innerHeight
       canvas.width = W
       canvas.height = H
       particles.length = 0
@@ -90,19 +97,20 @@ export default function BioCanvas() {
     init()
     draw()
 
-    const ro = new ResizeObserver(() => init())
-    ro.observe(canvas)
+    window.addEventListener('resize', init)
 
     return () => {
       cancelAnimationFrame(animId)
-      ro.disconnect()
+      window.removeEventListener('resize', init)
     }
-  }, [])
+  }, [active])
+
+  if (!active) return null
 
   return (
     <canvas
       ref={canvasRef}
-      className="pointer-events-none absolute inset-0 h-full w-full"
+      className="pointer-events-none fixed inset-0 z-[5]"
       style={{ opacity: 0.55 }}
     />
   )

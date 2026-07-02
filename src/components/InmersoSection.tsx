@@ -2,7 +2,6 @@ import { useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import { ArrowRight } from 'lucide-react'
-import BioCanvas from './BioCanvas'
 import { useElementScrollProgress } from '../hooks/useElementScrollProgress'
 
 const fadeUp = {
@@ -66,8 +65,6 @@ export default function InmersoSection() {
       className="relative w-full overflow-hidden"
       style={{ backgroundColor: '#050308' }}
     >
-      <BioCanvas />
-
       {/* violet depth wash */}
       <div
         className="pointer-events-none absolute inset-0"
