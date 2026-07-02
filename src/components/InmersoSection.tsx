@@ -202,13 +202,22 @@ export default function InmersoSection() {
           >
             Si llegas hasta aquí con algo en mente, me interesa escucharte.
           </p>
-          <Link
-            to="/contacto"
-            className="mt-4 inline-block font-sans text-base font-medium transition-opacity hover:opacity-80"
-            style={{ color: '#FF9E5E' }}
-          >
-            Escríbeme →
-          </Link>
+          <div className="mt-4 flex flex-wrap items-center gap-6">
+            <Link
+              to="/contacto"
+              className="font-sans text-base font-medium transition-opacity hover:opacity-80"
+              style={{ color: '#FF9E5E' }}
+            >
+              Escríbeme →
+            </Link>
+            <Link
+              to="/inmerso/portfolio"
+              className="font-sans text-sm transition-opacity hover:opacity-70"
+              style={{ color: 'rgba(237,234,245,0.45)' }}
+            >
+              Ver el trabajo →
+            </Link>
+          </div>
         </motion.div>
       </div>
     </section>
