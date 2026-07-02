@@ -71,7 +71,7 @@ export default function Navbar() {
                 >
                   <button
                     type="button"
-                    className="surface-link inline-flex items-center gap-1 transition-colors"
+                    className="surface-link inline-flex items-center gap-1 uppercase tracking-wide transition-colors"
                     style={{ color: linkColor }}
                     onClick={() => { window.location.hash = 'trabajo' }}
                   >
