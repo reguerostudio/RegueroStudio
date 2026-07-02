@@ -1,10 +1,16 @@
 import { Link } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
 import Footer from '../components/Footer'
+import SeoHead from '../components/SeoHead'
 
 export default function PrivacyPage() {
   return (
     <main style={{ backgroundColor: '#0a0f14' }}>
+      <SeoHead
+        title="Política de privacidad · Reguero Studio"
+        description="Cómo se tratan tus datos al escribir a Reguero Studio: qué recogemos, para qué y tus derechos según el RGPD."
+        path="/privacidad"
+      />
       <Link
         to="/"
         className="fixed left-6 top-6 z-50 flex items-center gap-2 font-sans text-xs uppercase tracking-[0.2em] text-[#dde8e9]/60 transition-colors hover:text-[#57b8bc]"

@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import MediaPlaceholder from './MediaPlaceholder'
 
 const STATS = [
   { value: '2026', label: 'Año de fundación' },
@@ -74,7 +75,7 @@ export default function ProofSection() {
           {CLIENTS.map((client, i) => (
             <motion.div
               key={client.n}
-              className="flex gap-6 border-t border-white/10 pt-6"
+              className="flex flex-col gap-6 border-t border-white/10 pt-6 sm:flex-row"
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true, margin: '-80px' }}
@@ -82,10 +83,19 @@ export default function ProofSection() {
               transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: i * 0.08 }}
             >
               <span className="font-mono text-sm text-[#9fe0e5]">{client.n}</span>
-              <div>
-                <p className="font-sans text-lg text-[#dde8e9]">{client.name}</p>
-                <p className="mt-1 font-sans text-sm text-[#dde8e9]/50">{client.detail}</p>
-                <p className="mt-2 font-sans text-base leading-relaxed text-[#dde8e9]/70">{client.work}</p>
+              <div className="flex flex-1 flex-col gap-4 sm:flex-row sm:items-start sm:gap-6">
+                <div className="flex-1">
+                  <p className="font-sans text-lg text-[#dde8e9]">{client.name}</p>
+                  <p className="mt-1 font-sans text-sm text-[#dde8e9]/50">{client.detail}</p>
+                  <p className="mt-2 font-sans text-base leading-relaxed text-[#dde8e9]/70">{client.work}</p>
+                </div>
+                <MediaPlaceholder
+                  label={`Proyecto ${client.name}`}
+                  kind="imagen"
+                  aspectRatio="landscape"
+                  variant="surface"
+                  className="w-full sm:w-40 sm:flex-none"
+                />
               </div>
             </motion.div>
           ))}

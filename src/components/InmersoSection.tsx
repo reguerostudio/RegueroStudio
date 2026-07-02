@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
+import { ArrowRight } from 'lucide-react'
 import BioCanvas from './BioCanvas'
 
 const fadeUp = {
@@ -187,9 +188,9 @@ export default function InmersoSection() {
           </p>
         </motion.div>
 
-        {/* CTA naranja */}
+        {/* CTA final */}
         <motion.div
-          className="mt-20"
+          className="mt-20 flex flex-col items-center gap-7 text-center"
           initial="hidden"
           whileInView="visible"
           viewport={vp}
@@ -202,22 +203,37 @@ export default function InmersoSection() {
           >
             Si llegas hasta aquí con algo en mente, me interesa escucharte.
           </p>
-          <div className="mt-4 flex flex-wrap items-center gap-6">
-            <Link
-              to="/contacto"
-              className="font-sans text-base font-medium transition-opacity hover:opacity-80"
-              style={{ color: '#FF9E5E' }}
-            >
-              Escríbeme →
-            </Link>
-            <Link
-              to="/inmerso/portfolio"
-              className="font-sans text-sm transition-opacity hover:opacity-70"
-              style={{ color: 'rgba(237,234,245,0.45)' }}
-            >
-              Ver el trabajo →
-            </Link>
-          </div>
+
+          <Link
+            to="/contacto"
+            className="font-sans text-base font-medium transition-opacity hover:opacity-80"
+            style={{ color: '#FF9E5E' }}
+          >
+            Escríbeme →
+          </Link>
+
+          <Link
+            to="/inmerso/portfolio"
+            className="group inline-flex items-center gap-3 rounded-full px-9 py-4 font-sans text-base font-medium transition-all duration-300"
+            style={{
+              backgroundColor: 'rgba(110,242,168,0.08)',
+              border: '1px solid rgba(110,242,168,0.4)',
+              color: '#6EF2A8',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = 'rgba(110,242,168,0.16)'
+              e.currentTarget.style.borderColor = 'rgba(110,242,168,0.7)'
+              e.currentTarget.style.boxShadow = '0 0 32px rgba(110,242,168,0.2)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'rgba(110,242,168,0.08)'
+              e.currentTarget.style.borderColor = 'rgba(110,242,168,0.4)'
+              e.currentTarget.style.boxShadow = 'none'
+            }}
+          >
+            Ver el trabajo
+            <ArrowRight size={18} className="transition-transform duration-300 group-hover:translate-x-1" />
+          </Link>
         </motion.div>
       </div>
     </section>

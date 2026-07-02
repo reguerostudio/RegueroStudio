@@ -4,6 +4,7 @@ import BioCanvas from '../components/BioCanvas'
 import CardVideo from '../components/CardVideo'
 import CardImagen from '../components/CardImagen'
 import CardCampana from '../components/CardCampana'
+import SeoHead from '../components/SeoHead'
 
 /* ── Aquí añades tus piezas cuando las tengas ───────────────────────────────
    Cada objeto es una tarjeta en el grid. Deja src/assets vacío para que
@@ -61,6 +62,11 @@ const ease = [0.16, 1, 0.3, 1] as const
 export default function InmersoPortfolioPage() {
   return (
     <main className="relative min-h-screen" style={{ backgroundColor: '#050308' }}>
+      <SeoHead
+        title="Portfolio · INMERSO — Reguero Studio"
+        description="El trabajo real de Fernando Reguero: campañas, vídeo, imagen. Proceso crudo, sin pulir para presentación."
+        path="/inmerso/portfolio"
+      />
       <Navbar />
       <BioCanvas />
 

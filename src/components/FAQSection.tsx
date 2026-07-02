@@ -30,11 +30,22 @@ const fadeUp = {
   visible: { opacity: 1, y: 0 },
 }
 
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: FAQS.map((faq) => ({
+    '@type': 'Question',
+    name: faq.q,
+    acceptedAnswer: { '@type': 'Answer', text: faq.a },
+  })),
+}
+
 export default function FAQSection() {
   const [open, setOpen] = useState<number | null>(null)
 
   return (
     <section id="faq" className="relative w-full px-6 pb-32 pt-12 sm:pb-40 sm:pt-16" style={{ backgroundColor: '#0a1520' }}>
+      <script type="application/ld+json">{JSON.stringify(faqJsonLd)}</script>
       <div className="mx-auto max-w-2xl">
         <motion.p
           className="font-sans text-xs uppercase tracking-[0.2em] text-[#57b8bc]/60"
