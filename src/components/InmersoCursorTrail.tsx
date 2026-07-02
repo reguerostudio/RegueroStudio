@@ -7,10 +7,13 @@ interface TrailParticle {
   bornAt: number
 }
 
-const LIFETIME_MS = 600
-const MAX_PARTICLES = 60
+const LIFETIME_MS = 450
+const MAX_PARTICLES = 18
+const MIN_SPAWN_INTERVAL_MS = 45
+const MIN_SPAWN_DISTANCE = 10
 
-/** Estela bioluminiscente que sigue el cursor. Solo desktop, solo INMERSO. */
+/** Estela bioluminiscente sutil que sigue el cursor. Solo desktop, solo
+ * INMERSO. Puntos pequeños y espaciados, no un halo denso. */
 export default function InmersoCursorTrail() {
   const active = useInmersoActive()
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -27,6 +30,9 @@ export default function InmersoCursorTrail() {
     const canvas: HTMLCanvasElement = canvasEl
     const ctx: CanvasRenderingContext2D = ctx2d
     const particles: TrailParticle[] = []
+    let lastSpawnAt = 0
+    let lastX = -1
+    let lastY = -1
     let animId: number
 
     function resize() {
@@ -35,7 +41,18 @@ export default function InmersoCursorTrail() {
     }
 
     function onMove(e: MouseEvent) {
-      particles.push({ x: e.clientX, y: e.clientY, bornAt: performance.now() })
+      const now = performance.now()
+      const dx = e.clientX - lastX
+      const dy = e.clientY - lastY
+      const moved = Math.hypot(dx, dy)
+
+      if (now - lastSpawnAt < MIN_SPAWN_INTERVAL_MS || moved < MIN_SPAWN_DISTANCE) return
+
+      lastSpawnAt = now
+      lastX = e.clientX
+      lastY = e.clientY
+
+      particles.push({ x: e.clientX, y: e.clientY, bornAt: now })
       if (particles.length > MAX_PARTICLES) particles.shift()
     }
 
@@ -51,15 +68,11 @@ export default function InmersoCursorTrail() {
           continue
         }
         const t = 1 - age / LIFETIME_MS
-        const radius = 2 + t * 3
+        const radius = 1.5 + t * 1.5
 
-        const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, radius * 4)
-        g.addColorStop(0, `rgba(110,242,168,${0.5 * t})`)
-        g.addColorStop(0.4, `rgba(110,242,168,${0.2 * t})`)
-        g.addColorStop(1, 'rgba(110,242,168,0)')
-        ctx.fillStyle = g
         ctx.beginPath()
-        ctx.arc(p.x, p.y, radius * 4, 0, Math.PI * 2)
+        ctx.fillStyle = `rgba(110,242,168,${0.35 * t})`
+        ctx.arc(p.x, p.y, radius, 0, Math.PI * 2)
         ctx.fill()
       }
 

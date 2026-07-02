@@ -8,13 +8,11 @@ import NotFoundPage from './pages/NotFoundPage'
 import InmersoDepthMeter from './components/InmersoDepthMeter'
 import InmersoCursorTrail from './components/InmersoCursorTrail'
 import InmersoSoundToggle from './components/InmersoSoundToggle'
-import InmersoGrainOverlay from './components/InmersoGrainOverlay'
 
 function App() {
   return (
     <>
       <ScrollToTop />
-      <InmersoGrainOverlay />
       <InmersoCursorTrail />
       <InmersoDepthMeter />
       <InmersoSoundToggle />
