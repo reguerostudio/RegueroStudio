@@ -1,4 +1,6 @@
 import { Layers } from 'lucide-react'
+import InmersoMark from './InmersoMark'
+import { pickMicrocopy, formatSighting } from '../lib/microcopy'
 
 interface CardCampanaProps {
   title: string
@@ -6,9 +8,10 @@ interface CardCampanaProps {
   tag?: string
   description?: string
   assets?: string[]   // URLs de imágenes del proyecto
+  sightingNumber?: number
 }
 
-export default function CardCampana({ title, client, tag, description, assets }: CardCampanaProps) {
+export default function CardCampana({ title, client, tag, description, assets, sightingNumber }: CardCampanaProps) {
   const isEmpty = !assets || assets.length === 0
 
   return (
@@ -16,26 +19,31 @@ export default function CardCampana({ title, client, tag, description, assets }:
       {isEmpty ? (
         /* placeholder con borde punteado */
         <div
-          className="flex min-h-[220px] flex-col items-center justify-center p-8 text-center"
+          className="relative flex min-h-[220px] flex-col items-center justify-center overflow-hidden p-8 text-center"
           style={{
             border: '1.5px dashed rgba(44,31,168,0.45)',
             backgroundColor: 'rgba(44,31,168,0.04)',
           }}
         >
-          <Layers size={24} style={{ color: 'rgba(44,31,168,0.5)' }} />
-          <p className="mt-3 font-sans text-sm" style={{ color: 'rgba(237,234,245,0.35)' }}>
+          <InmersoMark
+            size={72}
+            opacity={0.06}
+            className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+          />
+          <Layers size={24} style={{ color: 'rgba(44,31,168,0.5)' }} className="relative" />
+          <p className="relative mt-3 font-sans text-sm" style={{ color: 'rgba(237,234,245,0.5)' }}>
             {title}
           </p>
           {client && (
-            <p className="mt-1 font-sans text-xs" style={{ color: 'rgba(237,234,245,0.2)' }}>
+            <p className="relative mt-1 font-sans text-xs" style={{ color: 'rgba(237,234,245,0.35)' }}>
               {client}
             </p>
           )}
           <p
-            className="mt-4 font-sans text-[10px] uppercase tracking-[0.2em]"
-            style={{ color: 'rgba(110,242,168,0.35)' }}
+            className="relative mt-4 max-w-[220px] font-sans text-xs leading-snug"
+            style={{ color: 'rgba(110,242,168,0.5)' }}
           >
-            próximamente
+            {pickMicrocopy(title)}
           </p>
         </div>
       ) : (
@@ -50,7 +58,7 @@ export default function CardCampana({ title, client, tag, description, assets }:
                 className={`relative overflow-hidden ${assets.length >= 3 && i === 0 ? 'col-span-2' : ''}`}
                 style={{ aspectRatio: assets.length >= 3 && i === 0 ? '16/7' : '1/1' }}
               >
-                <img src={src} alt={`${title} ${i + 1}`} className="h-full w-full object-cover" />
+                <img src={src} alt={`${title} ${i + 1}`} loading="lazy" decoding="async" className="h-full w-full object-cover" />
               </div>
             ))}
           </div>
@@ -59,12 +67,19 @@ export default function CardCampana({ title, client, tag, description, assets }:
 
       {/* meta siempre visible */}
       <div className="px-1 pt-3 pb-1">
-        {tag && (
-          <p className="font-sans text-[10px] uppercase tracking-[0.2em]" style={{ color: 'rgba(110,242,168,0.55)' }}>
-            {tag}
-          </p>
-        )}
-        <p className="mt-1 font-sans text-sm" style={{ color: isEmpty ? 'rgba(237,234,245,0.3)' : '#EDEAF5' }}>
+        <div className="flex items-center justify-between gap-2">
+          {tag && (
+            <p className="font-sans text-[10px] uppercase tracking-[0.2em]" style={{ color: 'rgba(110,242,168,0.55)' }}>
+              {tag}
+            </p>
+          )}
+          {sightingNumber !== undefined && (
+            <p className="font-mono text-[10px]" style={{ color: 'rgba(237,234,245,0.35)' }}>
+              {formatSighting(sightingNumber)}
+            </p>
+          )}
+        </div>
+        <p className="mt-1 font-sans text-sm" style={{ color: isEmpty ? 'rgba(237,234,245,0.5)' : '#EDEAF5' }}>
           {title}
         </p>
         {client && (

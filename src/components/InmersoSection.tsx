@@ -1,7 +1,9 @@
+import { useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import { ArrowRight } from 'lucide-react'
 import BioCanvas from './BioCanvas'
+import { useElementScrollProgress } from '../hooks/useElementScrollProgress'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 28 },
@@ -13,30 +15,53 @@ const ease = [0.16, 1, 0.3, 1] as const
 
 const RAW_PROCESS = [
   {
-    n: '—',
+    n: '/',
     title: 'La primera versión siempre está mal.',
     desc: 'No porque sea malo. Sino porque no puedo saber lo que necesitas hasta que te enseño algo incorrecto y reaccionas. Lo primero que entrego es una pregunta disfrazada de propuesta.',
   },
   {
-    n: '—',
+    n: '/',
     title: 'La IA me da diez ideas en el tiempo que yo generaría una.',
     desc: 'Mi trabajo es saber cuál de las diez tiene razón. Eso no lo hace la IA. Lo hace criterio. Y el criterio no se automatiza, se entrena con fallos.',
   },
   {
-    n: '—',
+    n: '/',
     title: 'La tercera revisión revela lo que querías desde el principio.',
     desc: 'No te enfades. No es fallo tuyo ni mío. Es que no sabías cómo pedirlo hasta que viste lo que no era. Ahí empieza el trabajo real.',
   },
   {
-    n: '—',
+    n: '/',
     title: 'El cliente más difícil no es el más exigente.',
     desc: 'Es el que no sabe lo que quiere y no lo admite. Con ese no hay diseño que funcione. Por eso prefiero perder un cliente en la primera llamada antes de que me cueste dos semanas y mi reputación.',
   },
 ]
 
+const INTRO_PARAGRAPHS = [
+  'Un cliente en serio. Uno en proceso. Y esta web que construí yo mismo. Eso es todo lo que hay. Sin inflar, sin ocultar.',
+  'Lo que sí tengo: criterio que no me dejaron enseñar en ningún sitio porque todavía no termino el bachillerato. Lo aprendí en horas, en fallos, en conversaciones con gente que sabe más que yo.',
+  'La mayoría de mis reuniones terminan con "te escribo en unos días". No escriben. Aprendes a distinguir interés real de educación antes de que te haga daño.',
+  'He entregado trabajo que me gustaba mucho y que el cliente no entendió. He entregado trabajo que no me convencía y que al cliente le encantó. Eso te hace más humilde que cualquier crítica.',
+  'Diseñar es fácil. Lo que no enseña ningún curso de Domestika es saber qué diseñar, cuándo parar y por qué.',
+]
+
 export default function InmersoSection() {
+  const sectionRef = useRef<HTMLElement>(null)
+  const scrollDepth = useElementScrollProgress(sectionRef)
+
+  // compresión tipográfica sutil a medida que avanzas dentro de la sección
+  const bodyLineHeight = 1.7 - scrollDepth * 0.2
+  const bodyLetterSpacing = `${-0.01 * scrollDepth}em`
+
+  useEffect(() => {
+    console.log(
+      '%cSi estás aquí mirando el código, probablemente sepas apreciar el trabajo bien hecho.\nFer.',
+      'color:#6EF2A8;font-family:monospace;font-size:12px;',
+    )
+  }, [])
+
   return (
     <section
+      ref={sectionRef}
       id="inmerso"
       className="relative w-full overflow-hidden"
       style={{ backgroundColor: '#050308' }}
@@ -64,7 +89,7 @@ export default function InmersoSection() {
           variants={fadeUp}
           transition={{ duration: 0.7, ease }}
         >
-          INMERSO — proceso crudo
+          INMERSO / proceso crudo
         </motion.p>
 
         {/* Manifiesto */}
@@ -85,17 +110,11 @@ export default function InmersoSection() {
         </motion.h2>
 
         <div className="mt-12 flex flex-col gap-6">
-          {[
-            'Un cliente en serio. Uno en proceso. Y esta web que construí yo mismo. Eso es todo lo que hay. Sin inflar, sin ocultar.',
-            'Lo que sí tengo: criterio que no me dejaron enseñar en ningún sitio porque todavía no termino el bachillerato. Lo aprendí en horas, en fallos, en conversaciones con gente que sabe más que yo.',
-            'La mayoría de mis reuniones terminan con "te escribo en unos días". No escriben. Aprendes a distinguir interés real de educación antes de que te haga daño.',
-            'He entregado trabajo que me gustaba mucho y que el cliente no entendió. He entregado trabajo que no me convencía y que al cliente le encantó. Eso te hace más humilde que cualquier crítica.',
-            'Diseñar es fácil. Saber qué diseñar, cuándo parar y por qué — eso no te lo enseña ningún curso de Domestika.',
-          ].map((text, i) => (
+          {INTRO_PARAGRAPHS.map((text, i) => (
             <motion.p
               key={i}
-              className="font-sans text-base leading-relaxed sm:text-lg"
-              style={{ color: 'rgba(237,234,245,0.65)' }}
+              className="font-sans text-base sm:text-lg"
+              style={{ color: 'rgba(237,234,245,0.65)', lineHeight: bodyLineHeight, letterSpacing: bodyLetterSpacing }}
               initial="hidden"
               whileInView="visible"
               viewport={vp}
@@ -152,8 +171,8 @@ export default function InmersoSection() {
                   {step.title}
                 </p>
                 <p
-                  className="mt-3 font-sans text-sm leading-relaxed"
-                  style={{ color: 'rgba(237,234,245,0.55)' }}
+                  className="mt-3 font-sans text-sm"
+                  style={{ color: 'rgba(237,234,245,0.55)', lineHeight: bodyLineHeight, letterSpacing: bodyLetterSpacing }}
                 >
                   {step.desc}
                 </p>
@@ -182,9 +201,9 @@ export default function InmersoSection() {
           </p>
           <p
             className="mt-4 font-sans text-sm"
-            style={{ color: 'rgba(237,234,245,0.45)' }}
+            style={{ color: 'rgba(237,234,245,0.5)' }}
           >
-            — Fer, 19 años, Madrid
+            Fer, 19 años, Madrid
           </p>
         </motion.div>
 

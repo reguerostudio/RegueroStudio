@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { Menu, X, ChevronDown } from 'lucide-react'
+import InmersoMark from './InmersoMark'
 
 const INMERSO_LINKS = [
   { label: 'Portfolio', href: '/inmerso/portfolio' },
@@ -37,10 +38,11 @@ export default function Navbar() {
         >
           <Link
             to="/"
-            className="font-sans text-sm font-medium tracking-tight transition-colors duration-300"
+            className="flex items-center gap-2 font-sans text-sm font-medium tracking-tight transition-colors duration-300"
             style={{ color: logoColor }}
           >
             RS
+            {isInmerso && <InmersoMark size={13} color="#6EF2A8" opacity={0.7} />}
           </Link>
 
           {/* Desktop links */}

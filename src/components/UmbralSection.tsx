@@ -8,7 +8,7 @@ export default function UmbralSection() {
         background: 'linear-gradient(to bottom, #0a1520 0%, #080812 50%, #050308 100%)',
       }}
     >
-      {/* violet bleed — la turquesa se apaga, entra el violeta */}
+      {/* violet bleed: la turquesa se apaga, entra el violeta */}
       <div
         className="pointer-events-none absolute inset-0"
         style={{
@@ -25,7 +25,7 @@ export default function UmbralSection() {
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: 1, ease: 'easeOut' }}
         >
-          — umbral —
+          / umbral /
         </motion.p>
 
         <motion.p

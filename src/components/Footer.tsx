@@ -21,10 +21,10 @@ export default function Footer() {
           <p className="font-sans text-sm" style={{ color: 'rgba(237,234,245,0.55)' }}>
             Fernando Reguero Gallego
           </p>
-          <p className="mt-1 font-sans text-xs" style={{ color: 'rgba(237,234,245,0.28)' }}>
+          <p className="mt-1 font-sans text-xs" style={{ color: 'rgba(237,234,245,0.5)' }}>
             © 2026 · Madrid
           </p>
-          <p className="mt-4 max-w-xs font-serif text-sm italic" style={{ color: 'rgba(237,234,245,0.22)' }}>
+          <p className="mt-4 max-w-xs font-serif text-sm italic" style={{ color: 'rgba(237,234,245,0.5)' }}>
             El diseño bueno no se nota. Se siente. Y se compra.
           </p>
         </div>
@@ -37,13 +37,13 @@ export default function Footer() {
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 font-sans text-xs uppercase tracking-[0.2em] transition-all duration-200"
-              style={{ color: 'rgba(237,234,245,0.4)' }}
+              style={{ color: 'rgba(237,234,245,0.55)' }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.color = '#6EF2A8'
                 e.currentTarget.style.textShadow = '0 0 10px rgba(110,242,168,0.4)'
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.color = 'rgba(237,234,245,0.4)'
+                e.currentTarget.style.color = 'rgba(237,234,245,0.55)'
                 e.currentTarget.style.textShadow = 'none'
               }}
             >
@@ -56,13 +56,13 @@ export default function Footer() {
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 font-sans text-xs uppercase tracking-[0.2em] transition-all duration-200"
-              style={{ color: 'rgba(237,234,245,0.4)' }}
+              style={{ color: 'rgba(237,234,245,0.55)' }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.color = '#6EF2A8'
                 e.currentTarget.style.textShadow = '0 0 10px rgba(110,242,168,0.4)'
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.color = 'rgba(237,234,245,0.4)'
+                e.currentTarget.style.color = 'rgba(237,234,245,0.55)'
                 e.currentTarget.style.textShadow = 'none'
               }}
             >
@@ -74,16 +74,16 @@ export default function Footer() {
           <Link
             to="/privacidad"
             className="font-sans text-xs underline transition-all duration-200"
-            style={{ color: 'rgba(237,234,245,0.28)' }}
+            style={{ color: 'rgba(237,234,245,0.5)' }}
             onMouseEnter={(e) => { e.currentTarget.style.color = '#6EF2A8' }}
-            onMouseLeave={(e) => { e.currentTarget.style.color = 'rgba(237,234,245,0.28)' }}
+            onMouseLeave={(e) => { e.currentTarget.style.color = 'rgba(237,234,245,0.5)' }}
           >
             Política de privacidad
           </Link>
 
           <p
             className="font-sans text-[10px] uppercase tracking-[0.2em]"
-            style={{ color: 'rgba(237,234,245,0.18)' }}
+            style={{ color: 'rgba(237,234,245,0.5)' }}
           >
             Construida con IA. El criterio, siempre mío.
           </p>
